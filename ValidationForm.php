@@ -87,7 +87,7 @@ abstract class ValidationForm extends Form {
 				if (!$ruleClass::validate($value)) {
 					$message = $messages[$field][$rule] ?? $ruleClass::$message;
 					$label = $this->getField($field)->label;
-					$this->fieldMessages[$field][] = str_replace('{:label}', $label, $message); // todo: message string params
+					$this->fieldMessages[$field][] = str_replace('{:label}', $label ?: $field, $message); // todo: message string params
 					$isValid = false;
 					break;
 				}
