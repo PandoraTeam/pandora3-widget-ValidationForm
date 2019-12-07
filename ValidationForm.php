@@ -73,18 +73,34 @@ abstract class ValidationForm extends Form {
 		$isValid = true;
 		$rules = $this->rules();
 		$messages = $this->messages();
-		foreach (array_keys($this->fields) as $field) {
-			$fieldRules = $rules[$field] ?? [];
+		foreach ($rules as $field => $fieldRules) {
+			if (!$this->hasField($field)) {
+				continue;
+			}
 			if (is_string($fieldRules)) {
 				$fieldRules = [$fieldRules];
 			}
 			$value = $this->values[$field] ?? null;
-			foreach ($fieldRules as $rule) {
+			$requestValue = $this->requestValues[$field] ?? null;
+			foreach ($fieldRules as $key => $rule) {
+				$arguments = [];
+				$unSanitized = $arguments['unSanitized'] ?? false;
+				if (!is_numeric($key)) {
+					$arguments = $rule;
+					$rule = $key;
+					if (substr($rule, -12) === ':unSanitized') {
+						$rule = substr($rule, 0, strlen($rule) - 12);
+						$unSanitized = true;
+					}
+				}
 				if (!array_key_exists($rule, self::$ruleTypes)) {
 					throw new UnregisteredRuleException($rule);
 				}
 				$ruleClass = self::$ruleTypes[$rule];
-				if (!$ruleClass::validate($value)) {
+				/* if (!class_exists($sanitizerClass)) {
+					throw new SanitizerClassNotFoundException($sanitizerClass); // todo: custom exception
+				} */
+				if (!$ruleClass::validate($unSanitized ? $requestValue : $value, $arguments)) {
 					$message = $messages[$field][$rule] ?? $ruleClass::$message;
 					$label = $this->getField($field)->label;
 					$this->fieldMessages[$field][] = str_replace('{:label}', $label ?: $field, $message); // todo: message string params
