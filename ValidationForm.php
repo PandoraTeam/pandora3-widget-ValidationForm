@@ -4,7 +4,6 @@ namespace Pandora3\Widgets\ValidationForm;
 use Pandora3\Core\Interfaces\RequestInterface;
 use Pandora3\Widgets\Form\Form;
 use Pandora3\Widgets\ValidationForm\Exceptions\UnregisteredRuleException;
-use Pandora3\Widgets\ValidationForm\Rules\RuleRequired;
 
 /**
  * Class ValidationForm
@@ -25,7 +24,9 @@ abstract class ValidationForm extends Form {
 
 	/** @var array $ruleTypes */
 	protected static $ruleTypes = [
-		'required' => RuleRequired::class,
+		'required' => '\Pandora3\Widgets\ValidationForm\Rules\RuleRequired',
+		'date' => '\Pandora3\Widgets\ValidationForm\Rules\RuleDate',
+		'regexp' => '\Pandora3\Widgets\ValidationForm\Rules\RuleRegexp',
 	];
 
 	/**
